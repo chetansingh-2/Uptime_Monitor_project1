@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h1 class="text-3xl font-bold text-white mb-8 text-center">Are you sure?</h1>
+<p class="text-slate-300 mb-6 text-center">Are you sure you want to delete "{{ object.name }}"?</p>
+
+<form method="post" class="bg-slate-800 rounded-xl p-4 md:p-6 max-w-md md:max-w-lg mx-auto shadow-lg transition-all duration-300 hover:shadow-2xl hover:shadow-sky-500/30 border border-slate-700">
+    {% csrf_token %}
+    <div class="flex flex-col sm:flex-row gap-4">
+        <button type="submit" class="bg-sky-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-sky-700 transition-colors duration-200 shadow-lg hover:shadow-sky-700/50 w-full sm:w-auto">Yes, Delete</button>
+        <a href="{% url 'website-list' %}" class="text-sky-400 hover:text-sky-300 underline transition-colors duration-200 w-full sm:w-auto text-center sm:text-left">Cancel</a>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-900 flex items-center justify-center p-2 sm:p-4">
+    <div class="w-full max-w-xs sm:max-w-md">
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mb-6 sm:mb-10 text-center animate-fade-in">Create Account</h2>
+
+        <form method="post" class="bg-slate-800 rounded-xl p-4 sm:p-6 mx-auto shadow-2xl border border-slate-700 space-y-4">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="bg-red-900/50 border border-red-600 text-red-300 p-3 rounded-lg text-sm">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div>
+                <label for="{{ form.username.id_for_label }}" class="sr-only">{{ form.username.label }}</label>
+                <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}"
+                       class="w-full px-5 py-3 bg-slate-900 text-white text-lg rounded-xl border-2 border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-400 placeholder-slate-400"
+                       placeholder="Username"
+                       required>
+                {% if form.username.errors %}
+                    {{ form.username.errors }}
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.password1.id_for_label }}" class="sr-only">{{ form.password1.label }}</label>
+                <input type="password" name="{{ form.password1.name }}" id="{{ form.password1.id_for_label }}"
+                       class="w-full px-5 py-3 bg-slate-900 text-white text-lg rounded-xl border-2 border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-400 placeholder-slate-400"
+                       placeholder="Password"
+                       required>
+                {% if form.password1.errors %}
+                    {{ form.password1.errors }}
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.password2.id_for_label }}" class="sr-only">{{ form.password2.label }}</label>
+                <input type="password" name="{{ form.password2.name }}" id="{{ form.password2.id_for_label }}"
+                       class="w-full px-5 py-3 bg-slate-900 text-white text-lg rounded-xl border-2 border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-400 placeholder-slate-400"
+                       placeholder="Confirm Password"
+                       required>
+                 {% if form.password2.errors %}
+                    {{ form.password2.errors }}
+                {% endif %}
+            </div>
+
+            <div class="text-slate-400 text-xs px-2">
+                {{ form.password1.help_text|safe }}
+            </div>
+
+            <button type="submit"
+                class="bg-sky-600 text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-sky-700 transition-colors duration-200 shadow-lg hover:shadow-sky-700/50 w-full mt-4 sm:mt-6">
+                Sign Up
+            </button>
+        </form>
+
+        <p class="text-center mt-4 sm:mt-6">
+            <a href="{% url 'login' %}"
+                class="text-sky-400 hover:text-sky-300 underline transition-colors duration-200 font-medium">
+                Already have an account? Log in
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}
