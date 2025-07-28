@@ -52,8 +52,12 @@ INSTALLED_APPS = [
 
 
 
-CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/0")
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
+
+# Use an f-string to build the full URL with the password
+CELERY_BROKER_URL = f'redis://:{REDIS_PASSWORD}@127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND = f'redis://:{REDIS_PASSWORD}@127.0.0.1:6379/0'
+
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -67,7 +71,7 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'run-my-command-every-1-mins': {
         'task': 'run_custom_management_command', # This is the 'name' from @shared_task
-        'schedule': crontab(minute='*/1'),  # Executes every 30 minutes
+        'schedule': crontab(minute='*/30'),  # Executes every 30 minutes
         # 'args': (), # Optional arguments for the task
     },
 }
