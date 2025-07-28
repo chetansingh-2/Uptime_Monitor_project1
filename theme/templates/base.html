@@ -2,17 +2,27 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Uptime Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     {% tailwind_css %}
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+<body class="bg-slate-900 text-slate-100">
 
-    <main class="container mx-auto mt-8 px-4">
-        {% block content %}
-        {% endblock %}
-    </main>
+    <div class="flex flex-col min-h-screen">
+        {# The main content area grows to fill space and can accept custom layout classes #}
+        <main class="flex-grow container mx-auto px-4 {% block main_classes %}{% endblock %}">
+            {% block content %}
+            {% endblock %}
+        </main>
+
+        <footer class="w-full text-center py-6 mb-12">
+            <p class="text-sm text-slate-500">
+                built by chetan 🚀
+            </p>
+        </footer>
+    </div>
 
 </body>
 </html>

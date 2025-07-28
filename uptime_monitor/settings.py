@@ -28,11 +28,12 @@ DATABASE_URL = config('DATABASE_URL')
 SECRET_KEY = 'django-insecure-r!&vdocnt_lgy_3w5b*v%ip*y_m(95jzw#iwkbgi=v_0i4c=!l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['192.168.1.47', '127.0.0.1']
 
-
+ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,7 +46,33 @@ INSTALLED_APPS = [
     'monitor',
     'tailwind',
     'theme',
+    'django_celery_beat',
+
 ]
+
+
+
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/0")
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+# --- CELERY BEAT SETTINGS ---
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'run-my-command-every-1-mins': {
+        'task': 'run_custom_management_command', # This is the 'name' from @shared_task
+        'schedule': crontab(minute='*/1'),  # Executes every 30 minutes
+        # 'args': (), # Optional arguments for the task
+    },
+}
+
+
 
 TAILWIND_APP_NAME = 'theme'
 
