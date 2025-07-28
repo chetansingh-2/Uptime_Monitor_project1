@@ -28,7 +28,7 @@ DATABASE_URL = config('DATABASE_URL')
 SECRET_KEY = 'django-insecure-r!&vdocnt_lgy_3w5b*v%ip*y_m(95jzw#iwkbgi=v_0i4c=!l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # ALLOWED_HOSTS = []
 # ALLOWED_HOSTS = ['192.168.1.47', '127.0.0.1']
