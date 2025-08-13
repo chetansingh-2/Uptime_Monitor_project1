@@ -1,12 +1,21 @@
-{% load static tailwind_tags %}
+{% comment %}
+    We no longer need to load 'static' or 'tailwind_tags' 
+    if we are only using the CDN for styling.
+{% endcomment %}
+
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    {# This script pulls the latest version of Tailwind CSS directly from the CDN #}
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <title>Uptime Monitor</title>
+    
+    {# The ApexCharts script can remain as is #}
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    {% tailwind_css %}
 </head>
 <body class="bg-slate-900 text-slate-100">
 

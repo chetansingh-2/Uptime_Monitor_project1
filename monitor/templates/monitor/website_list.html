@@ -91,7 +91,7 @@
                                 
                                 {# Action links at the bottom of the card #}
                                 <div class="flex justify-start gap-6 border-t border-slate-700 pt-4 text-sm">
-                                    <a href="#" class="font-semibold text-sky-400 hover:text-sky-300 transition-colors">Details</a>
+                                    <a href="{% url 'website-detail' pk=website.pk %}" class="font-semibold text-sky-400 hover:text-sky-300 transition-colors">Details</a>
                                     <a href="{% url 'website-update' pk=website.pk %}" class="text-slate-400 hover:text-slate-300 transition-colors">Edit</a>
                                     <a href="{% url 'website-delete' pk=website.pk %}" class="text-rose-400 hover:text-rose-300 transition-colors">Delete</a>
                                 </div>

@@ -25,15 +25,16 @@ DATABASE_URL = config('DATABASE_URL')
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-r!&vdocnt_lgy_3w5b*v%ip*y_m(95jzw#iwkbgi=v_0i4c=!l'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 # ALLOWED_HOSTS = []
 # ALLOWED_HOSTS = ['192.168.1.47', '127.0.0.1']
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -44,19 +45,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'monitor',
-    'tailwind',
-    'theme',
     'django_celery_beat',
 
 ]
 
 
 
-REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
+
+REDIS_URL = config('REDIS_URL')
 
 # Use an f-string to build the full URL with the password
-CELERY_BROKER_URL = f'redis://:{REDIS_PASSWORD}@127.0.0.1:6379/0'
-CELERY_RESULT_BACKEND = f'redis://:{REDIS_PASSWORD}@127.0.0.1:6379/0'
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
@@ -78,8 +78,6 @@ CELERY_BEAT_SCHEDULE = {
 
 
 
-TAILWIND_APP_NAME = 'theme'
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -95,7 +93,7 @@ ROOT_URLCONF = 'uptime_monitor.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -155,8 +153,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static", 
+]
+
 
 
 # Default primary key field type
@@ -167,5 +173,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
-
-

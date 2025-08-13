@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="w-full bg-slate-900 min-h-screen p-4 sm:p-6 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+
+        {# HEADER SECTION - No changes here #}
+        <div class="flex flex-col md:flex-row justify-between md:items-center gap-6 mb-8">
+            <div>
+                <a href="{% url 'website-list' %}" class="inline-flex items-center text-sm text-sky-400 hover:text-sky-300 mb-3 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                    Back to Monitors
+                </a>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white">{{ website.name }}</h1>
+                    {% with latest_check=website.get_latest_check %}
+                        {% if latest_check %}
+                            <div class="w-3 h-3 rounded-full mt-1 shrink-0 {% if latest_check.is_up %}bg-emerald-400{% else %}bg-rose-400{% endif %}"></div>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                <p class="text-slate-400 mt-1">{{ website.url }}</p>
+            </div>
+            <div class="w-full md:w-auto">
+                <form id="time-range-form" class="flex items-center gap-3" method="GET">
+                    <label for="time-range" class="text-slate-300 font-medium text-sm">Time Range:</label>
+                    <select id="time-range" name="range" class="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full xs:w-auto p-2.5" onchange="document.getElementById('time-range-form').submit();">
+                        <option value="24h" {% if request.GET.range == '24h' or not request.GET.range %}selected{% endif %}>Last 24 Hours</option>
+                        <option value="7d"  {% if request.GET.range == '7d' %}selected{% endif %}>Last 7 Days</option>
+                        <option value="30d" {% if request.GET.range == '30d' %}selected{% endif %}>Last 30 Days</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+
+
+        {# --------------------------------- #}
+        {# MAIN DASHBOARD GRID                 #}
+        {# --------------------------------- #}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+                <h3 class="text-slate-400 text-sm font-medium mb-1">Avg Response Time</h3>
+                {# FIX: Use the pre-calculated 'avg_response_ms' from the view #}
+                <p class="text-white text-3xl font-semibold">{{ stats.avg_response_ms|floatformat:0 }}<span class="text-xl text-slate-300 ml-1">ms</span></p>
+            </div>
+            
+            <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+                <h3 class="text-slate-400 text-sm font-medium mb-1">Min Response Time</h3>
+                {# FIX: Use the pre-calculated 'min_response_ms' from the view #}
+                <p class="text-white text-3xl font-semibold">{{ stats.min_response_ms|floatformat:0 }}<span class="text-xl text-slate-300 ml-1">ms</span></p>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+                <h3 class="text-slate-400 text-sm font-medium mb-1">Max Response Time</h3>
+                {# FIX: Use the pre-calculated 'max_response_ms' from the view #}
+                <p class="text-white text-3xl font-semibold">{{ stats.max_response_ms|floatformat:0 }}<span class="text-xl text-slate-300 ml-1">ms</span></p>
+            </div>
+        </div>
+
+        {# The rest of the template is the same as the correct version from the previous response. #}
+        {# Chart Section - No changes here #}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 lg:col-span-2">
+                <h3 class="text-lg font-semibold text-white mb-4">Response Time (ms) - {{ time_range_label }}</h3>
+                <div id="response-time-chart" class="h-[300px]"></div>
+            </div>
+            <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+                <h3 class="text-lg font-semibold text-white mb-4">Status Codes</h3>
+                <div id="status-code-pie-chart" class="h-[300px]"></div>
+            </div>
+        </div>
+        
+        {# Table and Pagination Section - No changes here #}
+        <div class="bg-slate-800 rounded-xl border border-slate-700">
+            <h3 class="text-lg font-semibold text-white p-5">Check History</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-300">
+                    <thead class="text-xs text-slate-400 uppercase bg-slate-800">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Timestamp</th>
+                            <th scope="col" class="px-6 py-3">Status</th>
+                            <th scope="col" class="px-6 py-3">Code</th>
+                            <th scope="col" class="px-6 py-3 text-right">Response Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for check in page_obj %}
+                        <tr class="border-b border-slate-700">
+                            <td class="px-6 py-4 whitespace-nowrap">{{ check.timestamp|date:"F d, Y, P" }}</td>
+                            <td class="px-6 py-4">
+                                {% if check.is_up %}<span class="inline-flex items-center gap-2 text-emerald-400"><div class="w-2 h-2 rounded-full bg-current"></div> Up</span>
+                                {% else %}<span class="inline-flex items-center gap-2 text-rose-400"><div class="w-2 h-2 rounded-full bg-current"></div> Down</span>{% endif %}
+                            </td>
+                            <td class="px-6 py-4">{{ check.status_code|default:"N/A" }}</td>
+                            <td class="px-6 py-4 text-right font-mono">
+                                {% if check.response_time %}{{ check.response_time|floatformat:3 }}s{% else %}-{% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-slate-400 p-8">No checks found for this time period.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex justify-between items-center p-4 text-sm">
+                <span class="text-slate-400">Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} results</span>
+                <div class="inline-flex items-center gap-2">
+                    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&range={{ request.GET.range|default:'24h' }}" class="px-3 py-1 bg-slate-700 rounded-md hover:bg-slate-600 transition-colors">Previous</a>{% endif %}
+                    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&range={{ request.GET.range|default:'24h' }}" class="px-3 py-1 bg-slate-700 rounded-md hover:bg-slate-600 transition-colors">Next</a>{% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const responseTimeData = { timestamps: {{ response_time_labels_json|safe }}, values: {{ response_time_data_json|safe }} };
+        const pieChartData = { series: {{ pie_chart_series_json|safe }}, labels: {{ pie_chart_labels_json|safe }} };
+
+        const responseTimeOptions = {
+            chart: { type: 'area', height: '100%', toolbar: { show: false }, background: 'transparent', zoom: { enabled: false } },
+            series: [{ name: 'Response Time', data: responseTimeData.values }],
+            xaxis: { categories: responseTimeData.timestamps, labels: { style: { colors: '#94a3b8' } }, axisBorder: { show: false }, axisTicks: { show: false } },
+            yaxis: { labels: { style: { colors: '#94a3b8' }, formatter: (val) => val ? val.toFixed(0) : '' } },
+            dataLabels: { enabled: false },
+            stroke: { curve: 'smooth', width: 2 },
+            fill: { type: 'gradient', gradient: { shade: 'dark', type: 'vertical', opacityFrom: 0.6, opacityTo: 0.1, stops: [0, 100] }},
+            colors: ['#38bdf8'], grid: { borderColor: '#334155' },
+            tooltip: { theme: 'dark', y: { formatter: (val) => val ? val.toFixed(0) + ' ms' : 'N/A' } }
+        };
+        if (document.querySelector("#response-time-chart")) {
+            const responseTimeChart = new ApexCharts(document.querySelector("#response-time-chart"), responseTimeOptions);
+            responseTimeChart.render();
+        }
+        
+        const pieChartOptions = {
+            chart: { type: 'donut', height: '100%', background: 'transparent' },
+            series: pieChartData.series, labels: pieChartData.labels,
+            colors: ['#34d399', '#f87171', '#facc15', '#94a3b8'],
+            dataLabels: { enabled: false },
+            legend: { position: 'bottom', horizontalAlign: 'center', labels: { colors: '#d1d5db' }, markers: { width: 12, height: 12 }, itemMargin: { horizontal: 10 } },
+            tooltip: { theme: 'dark', y: { formatter: (val) => val + ' checks' } }
+        };
+        if (document.querySelector("#status-code-pie-chart")) {
+            const pieChart = new ApexCharts(document.querySelector("#status-code-pie-chart"), pieChartOptions);
+            pieChart.render();
+        }
+    });
+</script>
+
+{% endblock %}
